@@ -48,7 +48,3 @@ Which children should be rendered?
 [DOM viz](https://github.com/paul-jean/dom-viz) Chrome extension:
 
 - useful for visualizing DOM mutations
-
-#License
-
-Apache 2.0
