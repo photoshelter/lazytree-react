@@ -14,6 +14,10 @@
  * limitations under the License.
  */
 
+var LazyTree = require('../src/lazytree.jsx');
+var React = require('react');
+var $ = require('jquery');
+
 var nodeCallbacks = {
     arrayToLabelString: function(a) {
         var labelStr = '';
@@ -97,4 +101,13 @@ var nodeCallbacks = {
     }
 };
 
+$(document).ready(function() {
+    var root = $("#root");
+    root = root[0] || null;
+    if (!root) return null;
+    React.render(
+        <LazyTree nodeCallbacks={nodeCallbacks} level={0} rootElement={root}/>,
+        root
+    );
+});
 

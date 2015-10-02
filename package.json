@@ -1,0 +1,37 @@
+{
+  "name": "lazytree-react",
+  "version": "1.0.0",
+  "description": "A nested \"file\" tree react.js component, with streaming scroll and lazy-loading child nodes",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/photoshelter/lazytree-react.git"
+  },
+  "keywords": [
+    "react",
+    "lazytree",
+    "lazynode",
+    "lazy",
+    "load"
+  ],
+  "author": "Paul-Jean Letourneau",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/photoshelter/lazytree-react/issues"
+  },
+  "homepage": "https://github.com/photoshelter/lazytree-react#readme",
+  "devDependencies": {
+    "browserify": "^11.2.0",
+    "del": "^2.0.2",
+    "gulp": "^3.9.0",
+    "gulp-eslint": "^1.0.0",
+    "gulp-jshint": "^1.11.2",
+    "jquery": "^2.1.4",
+    "react": "^0.13.3",
+    "reactify": "^1.1.1",
+    "vinyl-source-stream": "^1.1.0"
+  }
+}
