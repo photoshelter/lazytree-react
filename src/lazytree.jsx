@@ -15,7 +15,10 @@
  */
 
 var React = require('react');
+var ReactAddons = require('react/addons').addons;
 var LazyNode = require('./lazynode.jsx');
+var utils = require('./utils.jsx');
+var $ = require('jquery');
 
 var Spacer = React.createClass({
     render: function() {
@@ -86,7 +89,7 @@ var LazyTree = React.createClass({
             value = val;
         }
         var subTreePathObj = this.getSubTreePathObj(treePathA, command, prop, value);
-        return React.addons.update(tree, subTreePathObj);
+        return ReactAddons.update(tree, subTreePathObj);
     },
 
     setChildNodesValueImmutable: function(tree, treePathParentA, prop, val) {
@@ -103,7 +106,7 @@ var LazyTree = React.createClass({
             return childrenObj;
         };
         var subTreePathObj = this.getSubTreePathObj(treePathParentA, '$apply', 'children', fn);
-        return React.addons.update(tree, subTreePathObj);
+        return ReactAddons.update(tree, subTreePathObj);
     },
 
     treeToArray: function(label, tree) {
@@ -184,7 +187,7 @@ var LazyTree = React.createClass({
                 return tree;
             }.bind(this);
         }.bind(this);
-        tree = React.addons.update(tree, {root: {children: {$apply: updateTree(nodesA)}}});
+        tree = ReactAddons.update(tree, {root: {children: {$apply: updateTree(nodesA)}}});
         // Cache viewport edges:
         this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(tree, nodesA));
         // Update the top and bottom spacer heights:
@@ -338,7 +341,7 @@ var LazyTree = React.createClass({
                 return nodeTreeState;
             }.bind(this);
         }.bind(this);
-        nodeTreeState = React.addons.update(nodeTreeState, {root: {children: {$apply: updateTree(nodesA, oldScrollPosition, this.scrollPosition, panelHeight, nodeHeight)}}});
+        nodeTreeState = ReactAddons.update(nodeTreeState, {root: {children: {$apply: updateTree(nodesA, oldScrollPosition, this.scrollPosition, panelHeight, nodeHeight)}}});
         this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(nodeTreeState, nodesA));
         // Update the top and bottom spacer heights:
         var spacerHeights = this.getSpacerHeights(nodeTreeState, nodesA, this.getViewportEdgeIndicesA());
@@ -376,7 +379,7 @@ var LazyTree = React.createClass({
                     return nodeTreeState;
                 }.bind(this);
             }.bind(this);
-            tree = React.addons.update(tree, {root: {children: {$apply: updateTree(nodesA, 0, panelHeight, nodeHeight)}}});
+            tree = ReactAddons.update(tree, {root: {children: {$apply: updateTree(nodesA, 0, panelHeight, nodeHeight)}}});
             this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(tree, nodesA));
             var spacerHeights = this.getSpacerHeights(tree, nodesA, this.getViewportEdgeIndicesA());
             this.setState({
@@ -413,7 +416,7 @@ var LazyTree = React.createClass({
         for (var i = viewportEdges[0]; i <= viewportEdges[1]; i ++) {
             if (i < 0) continue;
             var childTreePath = this.treePath([i]);
-            var key = arrayToKeyString(childTreePath);
+            var key = utils.arrayToKeyString(childTreePath);
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
             var inheritedProps = {};
             if (typeof this.props.nodeCallbacks.getInheritedProps === 'function') {
@@ -452,4 +455,4 @@ var LazyTree = React.createClass({
 
 });
 
-exports.LazyTree = LazyTree;
+module.exports = LazyTree;

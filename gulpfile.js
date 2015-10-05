@@ -8,7 +8,8 @@ var source = require('vinyl-source-stream');
 var eslint = require('gulp-eslint');
 
 var paths = {
-    jsx: ['src/lazytree.jsx', 'src/lazynode.jsx', 'demo/app.jsx']
+    lazytree: ['src/lazytree.jsx', 'src/lazynode.jsx', 'src/utils.jsx'],
+    demo: ['demo/demo.jsx']
 };
 
 gulp.task('clean', function(done) {
@@ -16,22 +17,33 @@ gulp.task('clean', function(done) {
 });
 
 gulp.task('lint', function() {
-    return gulp.src(paths.jsx)
+    return gulp.src(paths.lazytree, paths.demo)
     .pipe(eslint())
     .pipe(eslint.format())
     .pipe(eslint.failOnError())
 });
 
-gulp.task('lazytree', function() {
-    browserify(paths.jsx)
+gulp.task('build-lazytree', function() {
+    browserify(paths.lazytree)
     .transform(reactify)
     .bundle()
     .pipe(source('lazytree.js'))
     .pipe(gulp.dest('./build/'));
 });
 
-gulp.task('watch', function() {
-    gulp.watch(paths.jsx, ['lint', 'lazytree']);
+gulp.task('build-demo', function() {
+    browserify(paths.demo)
+    .transform(reactify)
+    .bundle()
+    .pipe(source('demo.js'))
+    .pipe(gulp.dest('./build/'));
 });
 
-gulp.task('default', ['watch', 'jsx']);
+gulp.task('build', ['build-lazytree', 'build-demo']);
+
+gulp.task('watch', function() {
+    gulp.watch(paths.lazytree, ['lint', 'build-lazytree']);
+    gulp.watch(paths.demo, ['lint', 'build-demo']);
+});
+
+gulp.task('default', ['watch', 'build-lazytree', 'build-demo']);

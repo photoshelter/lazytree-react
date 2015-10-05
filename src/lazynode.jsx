@@ -15,17 +15,7 @@
  */
 
 var React = require('react');
-
-var arrayToKeyString = function(a) {
-    var s = "", len = a.length;
-    a.forEach(function(e, i) {
-        s += e;
-        if (i < len - 1) {
-            s += '-';
-        }
-    });
-    return s;
-};
+var utils = require('./utils.jsx');
 
 var LazyNode = React.createClass({
 
@@ -82,7 +72,7 @@ var LazyNode = React.createClass({
                         inheritedProps = this.props.nodeCallbacks.getInheritedProps(childTreePathA, this.props);
                     }
                     childLabel = childLabels[index];
-                    nodeKey = arrayToKeyString(childTreePathA);
+                    nodeKey = utils.arrayToKeyString(childTreePathA);
                     childNodes.push(<LazyNode
                         key={nodeKey}
                         nodeLabel={childLabel}
@@ -143,4 +133,4 @@ var LazyNode = React.createClass({
 
 });
 
-exports.LazyNode = LazyNode;
+module.exports = LazyNode;
