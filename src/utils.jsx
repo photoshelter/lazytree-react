@@ -1,12 +1,48 @@
-var arrayToKeyString = function(a) {
-    var s = "", len = a.length;
-    a.forEach(function(e, i) {
-        s += e;
-        if (i < len - 1) {
-            s += '-';
-        }
-    });
-    return s;
+/**
+ * Copyright 2015 PhotoShelter, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var utils = {
+    arrayToKeyString: function(a) {
+        var s = "", len = a.length;
+        a.forEach(function(e, i) {
+            s += e;
+            if (i < len - 1) {
+                s += '-';
+            }
+        });
+        return s;
+    },
+
+    /*
+     * Returns true if the local cache contains the given tree path.
+     */
+    // node.js 'require' returns a singleton, so this prop will
+    // be shared by all instances that require this module:
+    treePathsLoaded: {},
+    areChildrenLoaded: function(treePath, props) {
+        var areLoaded = typeof this.treePathsLoaded[treePath] === 'object' ? true : false;
+        return areLoaded;
+    },
+
+    /*
+     * Get the children loaded at the specified tree path.
+     */
+    getChildLabels: function(treePath, props) {
+        return this.treePathsLoaded[treePath];
+    }
 };
 
-exports.arrayToKeyString = arrayToKeyString;
+module.exports = utils;

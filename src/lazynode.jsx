@@ -19,25 +19,12 @@ var utils = require('./utils.jsx');
 
 var LazyNode = React.createClass({
 
-    /*
-    arrayToLabelString: function(a) {
-        var labelStr = '';
-        a.forEach(function(e, i) {
-            labelStr += e;
-            if (i < a.length - 1) labelStr += ', ';
-        });
-        return labelStr;
-    },
-    */
-
     toggle: function() {
         this.props.toggleNodeExpanded(this.props.treePathA, this.props);
     },
 
     getNodeLabel: function() {
         var nodeLabel = this.props.nodeLabel;
-        // var treePathStr = this.arrayToLabelString(this.props.treePathA);
-        // nodeLabel = nodeLabel + ': [' + treePathStr + ']';
         return nodeLabel;
     },
 
@@ -49,11 +36,11 @@ var LazyNode = React.createClass({
         var childNodes = [];
         // If this node is expanded, render its (visible) children:
         if (isExpanded) {
-            var isLoaded = this.props.nodeCallbacks.areChildrenLoaded(this.props.treePathA, this.props);
+            var isLoaded = utils.areChildrenLoaded(this.props.treePathA, this.props);
             if (!isLoaded) {
                 childNodes.push(<div className="loading"><p>Loading ...</p></div>);
             } else {
-                var childLabels = this.props.nodeCallbacks.getChildLabels(this.props.treePathA, this.props);
+                var childLabels = utils.getChildLabels(this.props.treePathA, this.props);
                 var numChildNodes = childLabels.length;
                 var childPaths = [];
                 var head;

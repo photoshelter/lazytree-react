@@ -39,33 +39,19 @@ var nodeCallbacks = {
         return term;
     },
 
-    /*
-     * Returns true if the local cache contains the given tree path.
-     */
-    treePathsLoaded: {},
-    areChildrenLoaded: function(treePath, props) {
-        var areLoaded = typeof this.treePathsLoaded[treePath] === 'object' ? true : false;
-        return areLoaded;
-    },
-
-    /*
-     * Get the children loaded at the specified tree path.
-     */
-    getChildLabels: function(treePath, props) {
-        return this.treePathsLoaded[treePath];
-    },
 
     MAX_CHILD_NODES: 10,
     MAX_NODES_L1: 1000,
     /*
-     * Returns an array of labels for all children under the node at treePath.
+     * Loads children under the node at treePath. Calls successCallback when they're loaded.
+     * Or calls failCallback if the load fails.
      * treePath starts with ['root'] for the root node. Then ['root', 0] is the first child of the root.
      * ['root', 1] is the second child of the root. etc.
      */
-    loadChildren: function(treePath, props, successCallback, failCallback) {
+    loadChildren: function(treePath, props, successCb, failCb) {
         var numNodes;
         var maxNodes;
-        if (!treePath) return [];
+        if (!treePath) return null;
         if (treePath.length === 1) {
             maxNodes = this.MAX_NODES_L1;
         } else {
@@ -76,12 +62,17 @@ var nodeCallbacks = {
         for (var i = 0; i < numNodes; i ++) {
             nodes.push(this.getTerm(treePath.concat(i), props));
         }
-        // Set a short delay proportional to the number of child nodes:
+        // TODO: treePath -> treePathA
+        // Simulate a network call by setting an artificial delay
+        // proportional to the number of child nodes:
         window.setTimeout(function(successCb, failCb) {
-            this.treePathsLoaded[treePath] = nodes;
-            successCb(treePath);
-            // FIXME: what would the fail condition be?
-        }.bind(this, successCallback, failCallback), Math.min(numNodes * 100, 1000));
+            // A contrived failure condition that will never happen:
+            if (nodes.length !== numNodes) {
+                failCb(treePath, nodes);
+            } else {
+                successCb(treePath, nodes);
+            }
+        }.bind(this, successCb, failCb), Math.min(numNodes * 100, 1000));
     },
 
     extractInheritedProps: function(parentProps) {
@@ -31212,25 +31203,12 @@ var utils = require('./utils.jsx');
 
 var LazyNode = React.createClass({displayName: "LazyNode",
 
-    /*
-    arrayToLabelString: function(a) {
-        var labelStr = '';
-        a.forEach(function(e, i) {
-            labelStr += e;
-            if (i < a.length - 1) labelStr += ', ';
-        });
-        return labelStr;
-    },
-    */
-
     toggle: function() {
         this.props.toggleNodeExpanded(this.props.treePathA, this.props);
     },
 
     getNodeLabel: function() {
         var nodeLabel = this.props.nodeLabel;
-        // var treePathStr = this.arrayToLabelString(this.props.treePathA);
-        // nodeLabel = nodeLabel + ': [' + treePathStr + ']';
         return nodeLabel;
     },
 
@@ -31242,11 +31220,11 @@ var LazyNode = React.createClass({displayName: "LazyNode",
         var childNodes = [];
         // If this node is expanded, render its (visible) children:
         if (isExpanded) {
-            var isLoaded = this.props.nodeCallbacks.areChildrenLoaded(this.props.treePathA, this.props);
+            var isLoaded = utils.areChildrenLoaded(this.props.treePathA, this.props);
             if (!isLoaded) {
                 childNodes.push(React.createElement("div", {className: "loading"}, React.createElement("p", null, "Loading ...")));
             } else {
-                var childLabels = this.props.nodeCallbacks.getChildLabels(this.props.treePathA, this.props);
+                var childLabels = utils.getChildLabels(this.props.treePathA, this.props);
                 var numChildNodes = childLabels.length;
                 var childPaths = [];
                 var head;
@@ -31480,9 +31458,11 @@ var LazyTree = React.createClass({displayName: "LazyTree",
 
     toggleStateDeployed: function(tree, treePathA, nodeProps) {
         // Lazy-load additional child nodes when the parent is expanded:
-        var setChildLabels = function(treePathA) {
+        var setChildLabels = function(treePathA, childrenLoaded) {
+            // update cache of loaded children:
+            utils.treePathsLoaded[treePathA] = childrenLoaded;
             var children = {};
-            var labels = this.props.nodeCallbacks.getChildLabels(treePathA, nodeProps);
+            var labels = utils.getChildLabels(treePathA, nodeProps);
             labels.forEach(function(label, index) {
                 children[index] = {'label': label, 'deployed': false, 'children': {}};
             });
@@ -31491,7 +31471,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             tree = this.setChildNodesValueImmutable(tree, treePathA, 'deployed', true);
             this.setSequentialTreeState(tree);
         }.bind(this);
-        if (!this.props.nodeCallbacks.areChildrenLoaded(treePathA, nodeProps)) {
+        if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
             this.props.nodeCallbacks.loadChildren(treePathA, nodeProps, setChildLabels, null);
             // Expand the node now to show the "loading" spinner:
             tree = this.setNodeValueImmutable(tree, treePathA, 'expanded', true);
@@ -31686,8 +31666,9 @@ var LazyTree = React.createClass({displayName: "LazyTree",
 
     componentWillMount: function() {
         var tree = this.state.nodeTreeState;
-        var initTreeState = function() {
-            var topNodes = this.props.nodeCallbacks.getChildLabels(this.treePath([]), this.props);
+        var initTreeState = function(treePathA, childrenLoaded) {
+            utils.treePathsLoaded[treePathA] = childrenLoaded;
+            var topNodes = utils.getChildLabels(this.treePath([]), this.props);
             var children = {};
             // Init a large tree with variable numbers of nodes at the second level:
             topNodes.forEach(function(label, index) {
@@ -31719,7 +31700,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
                 spacerHeights: spacerHeights
             });
         }.bind(this);
-        if (!this.props.nodeCallbacks.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
             this.props.nodeCallbacks.loadChildren(this.treePath([]), this.props, initTreeState, null);
         }
     },
@@ -31733,7 +31714,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
     },
 
     render: function() {
-        if (!this.props.nodeCallbacks.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
             return (React.createElement("div", {className: "loading"}, React.createElement("p", null, "Loading ...")));
         }
         var topNodes = Object.keys(this.getChildData(this.treePath([])));
@@ -31789,17 +31770,53 @@ var LazyTree = React.createClass({displayName: "LazyTree",
 module.exports = LazyTree;
 
 },{"./lazynode.jsx":177,"./utils.jsx":179,"jquery":3,"react":176,"react/addons":4}],179:[function(require,module,exports){
-var arrayToKeyString = function(a) {
-    var s = "", len = a.length;
-    a.forEach(function(e, i) {
-        s += e;
-        if (i < len - 1) {
-            s += '-';
-        }
-    });
-    return s;
+/**
+ * Copyright 2015 PhotoShelter, Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+var utils = {
+    arrayToKeyString: function(a) {
+        var s = "", len = a.length;
+        a.forEach(function(e, i) {
+            s += e;
+            if (i < len - 1) {
+                s += '-';
+            }
+        });
+        return s;
+    },
+
+    /*
+     * Returns true if the local cache contains the given tree path.
+     */
+    // node.js 'require' returns a singleton, so this prop will
+    // be shared by all instances that require this module:
+    treePathsLoaded: {},
+    areChildrenLoaded: function(treePath, props) {
+        var areLoaded = typeof this.treePathsLoaded[treePath] === 'object' ? true : false;
+        return areLoaded;
+    },
+
+    /*
+     * Get the children loaded at the specified tree path.
+     */
+    getChildLabels: function(treePath, props) {
+        return this.treePathsLoaded[treePath];
+    }
 };
 
-exports.arrayToKeyString = arrayToKeyString;
+module.exports = utils;
 
 },{}]},{},[1]);

@@ -149,9 +149,11 @@ var LazyTree = React.createClass({
 
     toggleStateDeployed: function(tree, treePathA, nodeProps) {
         // Lazy-load additional child nodes when the parent is expanded:
-        var setChildLabels = function(treePathA) {
+        var setChildLabels = function(treePathA, childrenLoaded) {
+            // update cache of loaded children:
+            utils.treePathsLoaded[treePathA] = childrenLoaded;
             var children = {};
-            var labels = this.props.nodeCallbacks.getChildLabels(treePathA, nodeProps);
+            var labels = utils.getChildLabels(treePathA, nodeProps);
             labels.forEach(function(label, index) {
                 children[index] = {'label': label, 'deployed': false, 'children': {}};
             });
@@ -160,7 +162,7 @@ var LazyTree = React.createClass({
             tree = this.setChildNodesValueImmutable(tree, treePathA, 'deployed', true);
             this.setSequentialTreeState(tree);
         }.bind(this);
-        if (!this.props.nodeCallbacks.areChildrenLoaded(treePathA, nodeProps)) {
+        if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
             this.props.nodeCallbacks.loadChildren(treePathA, nodeProps, setChildLabels, null);
             // Expand the node now to show the "loading" spinner:
             tree = this.setNodeValueImmutable(tree, treePathA, 'expanded', true);
@@ -355,8 +357,9 @@ var LazyTree = React.createClass({
 
     componentWillMount: function() {
         var tree = this.state.nodeTreeState;
-        var initTreeState = function() {
-            var topNodes = this.props.nodeCallbacks.getChildLabels(this.treePath([]), this.props);
+        var initTreeState = function(treePathA, childrenLoaded) {
+            utils.treePathsLoaded[treePathA] = childrenLoaded;
+            var topNodes = utils.getChildLabels(this.treePath([]), this.props);
             var children = {};
             // Init a large tree with variable numbers of nodes at the second level:
             topNodes.forEach(function(label, index) {
@@ -388,7 +391,7 @@ var LazyTree = React.createClass({
                 spacerHeights: spacerHeights
             });
         }.bind(this);
-        if (!this.props.nodeCallbacks.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
             this.props.nodeCallbacks.loadChildren(this.treePath([]), this.props, initTreeState, null);
         }
     },
@@ -402,7 +405,7 @@ var LazyTree = React.createClass({
     },
 
     render: function() {
-        if (!this.props.nodeCallbacks.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
             return (<div className="loading"><p>Loading ...</p></div>);
         }
         var topNodes = Object.keys(this.getChildData(this.treePath([])));

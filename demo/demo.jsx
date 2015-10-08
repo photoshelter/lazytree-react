@@ -38,33 +38,19 @@ var nodeCallbacks = {
         return term;
     },
 
-    /*
-     * Returns true if the local cache contains the given tree path.
-     */
-    treePathsLoaded: {},
-    areChildrenLoaded: function(treePath, props) {
-        var areLoaded = typeof this.treePathsLoaded[treePath] === 'object' ? true : false;
-        return areLoaded;
-    },
-
-    /*
-     * Get the children loaded at the specified tree path.
-     */
-    getChildLabels: function(treePath, props) {
-        return this.treePathsLoaded[treePath];
-    },
 
     MAX_CHILD_NODES: 10,
     MAX_NODES_L1: 1000,
     /*
-     * Returns an array of labels for all children under the node at treePath.
+     * Loads children under the node at treePath. Calls successCallback when they're loaded.
+     * Or calls failCallback if the load fails.
      * treePath starts with ['root'] for the root node. Then ['root', 0] is the first child of the root.
      * ['root', 1] is the second child of the root. etc.
      */
-    loadChildren: function(treePath, props, successCallback, failCallback) {
+    loadChildren: function(treePath, props, successCb, failCb) {
         var numNodes;
         var maxNodes;
-        if (!treePath) return [];
+        if (!treePath) return null;
         if (treePath.length === 1) {
             maxNodes = this.MAX_NODES_L1;
         } else {
@@ -75,12 +61,17 @@ var nodeCallbacks = {
         for (var i = 0; i < numNodes; i ++) {
             nodes.push(this.getTerm(treePath.concat(i), props));
         }
-        // Set a short delay proportional to the number of child nodes:
+        // TODO: treePath -> treePathA
+        // Simulate a network call by setting an artificial delay
+        // proportional to the number of child nodes:
         window.setTimeout(function(successCb, failCb) {
-            this.treePathsLoaded[treePath] = nodes;
-            successCb(treePath);
-            // FIXME: what would the fail condition be?
-        }.bind(this, successCallback, failCallback), Math.min(numNodes * 100, 1000));
+            // A contrived failure condition that will never happen:
+            if (nodes.length !== numNodes) {
+                failCb(treePath, nodes);
+            } else {
+                successCb(treePath, nodes);
+            }
+        }.bind(this, successCb, failCb), Math.min(numNodes * 100, 1000));
     },
 
     extractInheritedProps: function(parentProps) {
