@@ -20,6 +20,9 @@ var React = require('react');
 var $ = require('jquery');
 
 var nodeCallbacks = {
+    // Height of a node, in px
+    NODE_HEIGHT: 30,
+
     arrayToLabelString: function(a) {
         var labelStr = '';
         a.forEach(function(e, i) {
@@ -32,10 +35,8 @@ var nodeCallbacks = {
     /*
      * Returns the label for the node at treePath.
      */
-    getTerm: function(treePath, props) {
+    getTerm: function(treePath) {
         var term = this.arrayToLabelString(treePath);
-        var inheritedProps = this.extractInheritedProps(props);
-        term += " (" + inheritedProps.level + ")";
         return term;
     },
 
@@ -60,9 +61,10 @@ var nodeCallbacks = {
         numNodes = Math.max(Math.floor(Math.random() * maxNodes), 1);
         var nodes = [];
         for (var i = 0; i < numNodes; i ++) {
-            nodes.push(this.getTerm(treePath.concat(i), props));
+            nodes.push(this.getTerm(treePath.concat(i)));
         }
         // TODO: treePath -> treePathA
+        //
         // Simulate a network call by setting an artificial delay
         // proportional to the number of child nodes:
         window.setTimeout(function(successCb, failCb) {
@@ -73,24 +75,8 @@ var nodeCallbacks = {
                 successCb(treePath, nodes);
             }
         }.bind(this, successCb, failCb), Math.min(numNodes * 100, 1000));
-    },
-
-    extractInheritedProps: function(parentProps) {
-        var inheritedProps;
-        if (parentProps.inheritedProps) {
-            inheritedProps = parentProps.inheritedProps;
-        } else {
-            inheritedProps = parentProps;
-        }
-        return inheritedProps;
-    },
-
-    getInheritedProps: function(treePath, parentProps) {
-        var childProps = {};
-        var inheritedProps = this.extractInheritedProps(parentProps);
-        childProps.level = inheritedProps.level + 1;
-        return childProps;
     }
+
 };
 
 $(document).ready(function() {
@@ -31536,20 +31522,8 @@ var LazyTree = React.createClass({displayName: "LazyTree",
         return root.clientHeight;
     },
 
-    NODE_HEIGHT_GUESS: 30,
-    cacheNodeHeight: function() {
-        var nodes = $("div.node");
-        if (nodes.length < 1) {
-            this.NODE_HEIGHT = this.NODE_HEIGHT_GUESS;
-        } else {
-            var listItem = nodes[0];
-            this.NODE_HEIGHT = listItem.offsetHeight;
-        }
-        return this.NODE_HEIGHT;
-    },
-
     getNodeHeight: function() {
-        return this.NODE_HEIGHT;
+        return this.props.nodeCallbacks.NODE_HEIGHT;
     },
 
     getViewportEdgeIndicesA: function() {
@@ -31758,7 +31732,6 @@ var LazyTree = React.createClass({displayName: "LazyTree",
     },
 
     componentDidMount: function() {
-        this.cacheNodeHeight();
         this.scrollPosition = this.getScrollPosition();
         this.getRootElement().onmousewheel = function(e) {
             this.handleScroll(e);

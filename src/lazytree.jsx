@@ -227,20 +227,8 @@ var LazyTree = React.createClass({
         return root.clientHeight;
     },
 
-    NODE_HEIGHT_GUESS: 30,
-    cacheNodeHeight: function() {
-        var nodes = $("div.node");
-        if (nodes.length < 1) {
-            this.NODE_HEIGHT = this.NODE_HEIGHT_GUESS;
-        } else {
-            var listItem = nodes[0];
-            this.NODE_HEIGHT = listItem.offsetHeight;
-        }
-        return this.NODE_HEIGHT;
-    },
-
     getNodeHeight: function() {
-        return this.NODE_HEIGHT;
+        return this.props.nodeCallbacks.NODE_HEIGHT;
     },
 
     getViewportEdgeIndicesA: function() {
@@ -449,7 +437,6 @@ var LazyTree = React.createClass({
     },
 
     componentDidMount: function() {
-        this.cacheNodeHeight();
         this.scrollPosition = this.getScrollPosition();
         this.getRootElement().onmousewheel = function(e) {
             this.handleScroll(e);
