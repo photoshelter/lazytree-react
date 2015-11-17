@@ -31096,6 +31096,9 @@ module.exports = require('./lib/React');
 var React = require('react');
 var utils = require('./utils.jsx');
 
+/**
+ * Tree node with lazy-loading children. Children load on parent node expansion.
+ */
 var LazyNode = React.createClass({displayName: "LazyNode",
 
     toggle: function() {
@@ -31156,6 +31159,12 @@ var LazyNode = React.createClass({displayName: "LazyNode",
             }
         }
 
+        // Decide whether to render this node and/or its children:
+        // occluded     expanded        render node     render children
+        // no           no              yes             no
+        // no           yes             yes             yes
+        // yes          no              no              no
+        // yes          yes             no              yes
         if (isOccluded) {
             if (!isExpanded) {
                 // If this node is OCCLUDED and is NOT EXPANDED, then don't need
