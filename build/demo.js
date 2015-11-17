@@ -31234,8 +31234,7 @@ var LazyNode = React.createClass({displayName: "LazyNode",
                         isNodeExpanded: this.props.isNodeExpanded, 
                         isNodeOccluded: this.props.isNodeOccluded, 
                         getChildViewportEdgeIndicesA: this.props.getChildViewportEdgeIndicesA, 
-                        getChildData: this.props.getChildData, 
-                        nodeCallbacks: this.props.nodeCallbacks}
+                        getChildData: this.props.getChildData}
                     ));
                 }
             }
@@ -31532,7 +31531,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             this.setSequentialTreeState(tree);
         }.bind(this);
         if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
-            var failCb = function(path, nodes) { console.warn('failed to load path ' + path);};
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
             this.props.loadChildren(treePathA, nodeProps, setChildLabels, failCb);
             // Expand the node now to show the "loading" spinner:
             tree = this.setNodeValueImmutable(tree, treePathA, 'expanded', true);
@@ -31799,7 +31798,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             });
         }.bind(this);
         if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
-            var failCb = function(path, nodes) { console.warn('failed to load path ' + path);};
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
             this.props.loadChildren(this.treePath([]), this.props, initTreeState, failCb);
         }
     },
@@ -31828,6 +31827,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             if (i < 0) continue;
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
+            debugger;
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
             nodesToRender.push(React.createElement(LazyNode, {
                 key: key, 

@@ -70,7 +70,6 @@ var LazyNode = React.createClass({
                         isNodeOccluded={this.props.isNodeOccluded}
                         getChildViewportEdgeIndicesA={this.props.getChildViewportEdgeIndicesA}
                         getChildData={this.props.getChildData}
-                        nodeCallbacks={this.props.nodeCallbacks}
                     />);
                 }
             }

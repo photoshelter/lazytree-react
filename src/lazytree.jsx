@@ -533,6 +533,7 @@ var LazyTree = React.createClass({
             if (i < 0) continue;
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
+            debugger;
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
             nodesToRender.push(<LazyNode
                 key={key}

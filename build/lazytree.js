@@ -31148,8 +31148,7 @@ var LazyNode = React.createClass({displayName: "LazyNode",
                         isNodeExpanded: this.props.isNodeExpanded, 
                         isNodeOccluded: this.props.isNodeOccluded, 
                         getChildViewportEdgeIndicesA: this.props.getChildViewportEdgeIndicesA, 
-                        getChildData: this.props.getChildData, 
-                        nodeCallbacks: this.props.nodeCallbacks}
+                        getChildData: this.props.getChildData}
                     ));
                 }
             }
@@ -31742,6 +31741,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             if (i < 0) continue;
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
+            debugger;
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
             nodesToRender.push(React.createElement(LazyNode, {
                 key: key, 
