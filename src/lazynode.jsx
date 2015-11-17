@@ -59,6 +59,7 @@ var LazyNode = React.createClass({
                 for (index = indexLastNodeOccludedAbove; index <= indexFirstNodeOccludedBelow; index ++) {
                     childTreePathA = this.props.treePathA.concat(index);
                     childLabel = childLabels[index];
+                    // TODO: setting a key here but still getting a warning that they're not unique?
                     nodeKey = utils.arrayToKeyString(childTreePathA);
                     childNodes.push(<LazyNode
                         key={nodeKey}

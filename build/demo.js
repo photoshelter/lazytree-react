@@ -39,8 +39,8 @@ var getTerm = function(treePath) {
 };
 
 /*
- * Loads children under the node at treePath. Calls successCallback when they're loaded.
- * Or calls failCallback if the load fails.
+ * Loads children under the node at treePath. Calls successCb when they're loaded.
+ * Or calls failCb if the load fails.
  * treePath starts with ['root'] for the root node. Then ['root', 0] is the first child of the root.
  * ['root', 1] is the second child of the root. etc.
  */
@@ -31224,6 +31224,7 @@ var LazyNode = React.createClass({displayName: "LazyNode",
                 for (index = indexLastNodeOccludedAbove; index <= indexFirstNodeOccludedBelow; index ++) {
                     childTreePathA = this.props.treePathA.concat(index);
                     childLabel = childLabels[index];
+                    // TODO: setting a key here but still getting a warning that they're not unique?
                     nodeKey = utils.arrayToKeyString(childTreePathA);
                     childNodes.push(React.createElement(LazyNode, {
                         key: nodeKey, 
@@ -31827,7 +31828,6 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             if (i < 0) continue;
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
-            debugger;
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
             nodesToRender.push(React.createElement(LazyNode, {
                 key: key, 

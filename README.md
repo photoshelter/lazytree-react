@@ -2,6 +2,34 @@
 
 A nested "file" tree React.js component, with streaming scroll and lazy-loading child nodes.
 
+## Demo
+
+## Installation
+
+## Usage
+
+```javascript
+    var LazyTree = require('lazytree.jsx');
+```
+
+```javascript
+    var root = $("#root")[0];
+    <LazyTree
+        loadChildren={loadChildren}
+        nodeHeight={30}
+        rootElement={root}
+    />
+```
+
+
+## License
+
+Apache 2.0
+
+## TODO:
+
+- Implement lazy-loading scroll (could use [Waypoint](https://github.com/brigade/react-waypoint))
+
 ## LazyTree: a lazy-loading nested 'file' tree in React
 
 __Lazy children__: expand node, children lazy-load:
