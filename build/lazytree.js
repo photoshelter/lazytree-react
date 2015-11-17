@@ -31134,12 +31134,9 @@ var LazyNode = React.createClass({displayName: "LazyNode",
                 indexLastNodeOccludedAbove = indexLastNodeOccludedAbove > 0 ? indexLastNodeOccludedAbove : 0;
                 var indexFirstNodeOccludedBelow = childViewportEdgeIndicesA[1];
                 indexFirstNodeOccludedBelow = indexFirstNodeOccludedBelow > 0 ? indexFirstNodeOccludedBelow : numChildNodes - 1;
-                var childLabel, childTreePathA, nodeKey, index, inheritedProps;
+                var childLabel, childTreePathA, nodeKey, index;
                 for (index = indexLastNodeOccludedAbove; index <= indexFirstNodeOccludedBelow; index ++) {
                     childTreePathA = this.props.treePathA.concat(index);
-                    if (typeof this.props.nodeCallbacks.getInheritedProps === 'function') {
-                        inheritedProps = this.props.nodeCallbacks.getInheritedProps(childTreePathA, this.props);
-                    }
                     childLabel = childLabels[index];
                     nodeKey = utils.arrayToKeyString(childTreePathA);
                     childNodes.push(React.createElement(LazyNode, {
@@ -31152,8 +31149,7 @@ var LazyNode = React.createClass({displayName: "LazyNode",
                         isNodeOccluded: this.props.isNodeOccluded, 
                         getChildViewportEdgeIndicesA: this.props.getChildViewportEdgeIndicesA, 
                         getChildData: this.props.getChildData, 
-                        nodeCallbacks: this.props.nodeCallbacks, 
-                        inheritedProps: inheritedProps}
+                        nodeCallbacks: this.props.nodeCallbacks}
                     ));
                 }
             }
@@ -31450,7 +31446,8 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             this.setSequentialTreeState(tree);
         }.bind(this);
         if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
-            this.props.nodeCallbacks.loadChildren(treePathA, nodeProps, setChildLabels, null);
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
+            this.props.loadChildren(treePathA, nodeProps, setChildLabels, failCb);
             // Expand the node now to show the "loading" spinner:
             tree = this.setNodeValueImmutable(tree, treePathA, 'expanded', true);
             this.setState({nodeTreeState: tree});
@@ -31528,7 +31525,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
     },
 
     getNodeHeight: function() {
-        return this.props.nodeCallbacks.NODE_HEIGHT;
+        return this.props.nodeHeight;
     },
 
     getViewportEdgeIndicesA: function() {
@@ -31716,7 +31713,8 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             });
         }.bind(this);
         if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
-            this.props.nodeCallbacks.loadChildren(this.treePath([]), this.props, initTreeState, null);
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
+            this.props.loadChildren(this.treePath([]), this.props, initTreeState, failCb);
         }
     },
 
@@ -31745,10 +31743,6 @@ var LazyTree = React.createClass({displayName: "LazyTree",
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
-            var inheritedProps = {};
-            if (typeof this.props.nodeCallbacks.getInheritedProps === 'function') {
-                inheritedProps = this.props.nodeCallbacks.getInheritedProps(childTreePath, this.props);
-            }
             nodesToRender.push(React.createElement(LazyNode, {
                 key: key, 
                 nodeLabel: nodeLabel, 
@@ -31758,9 +31752,7 @@ var LazyTree = React.createClass({displayName: "LazyTree",
                 isNodeExpanded: this.isNodeExpanded, 
                 isNodeOccluded: this.isNodeOccluded, 
                 getChildViewportEdgeIndicesA: this.getChildViewportEdgeIndicesA, 
-                getChildData: this.getChildData, 
-                nodeCallbacks: this.props.nodeCallbacks, 
-                inheritedProps: inheritedProps}
+                getChildData: this.getChildData}
             ));
         }
         nodesToRender.push(React.createElement(Spacer, {key: 'spacer-bottom', height: this.state.spacerHeights[1], width: this.getSpacerWidth()}));

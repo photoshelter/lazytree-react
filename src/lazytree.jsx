@@ -237,7 +237,8 @@ var LazyTree = React.createClass({
             this.setSequentialTreeState(tree);
         }.bind(this);
         if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
-            this.props.nodeCallbacks.loadChildren(treePathA, nodeProps, setChildLabels, null);
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
+            this.props.loadChildren(treePathA, nodeProps, setChildLabels, failCb);
             // Expand the node now to show the "loading" spinner:
             tree = this.setNodeValueImmutable(tree, treePathA, 'expanded', true);
             this.setState({nodeTreeState: tree});
@@ -315,7 +316,7 @@ var LazyTree = React.createClass({
     },
 
     getNodeHeight: function() {
-        return this.props.nodeCallbacks.NODE_HEIGHT;
+        return this.props.nodeHeight;
     },
 
     getViewportEdgeIndicesA: function() {
@@ -503,7 +504,8 @@ var LazyTree = React.createClass({
             });
         }.bind(this);
         if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
-            this.props.nodeCallbacks.loadChildren(this.treePath([]), this.props, initTreeState, null);
+            var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
+            this.props.loadChildren(this.treePath([]), this.props, initTreeState, failCb);
         }
     },
 
@@ -532,10 +534,6 @@ var LazyTree = React.createClass({
             var childTreePath = this.treePath([i]);
             var key = utils.arrayToKeyString(childTreePath);
             var nodeLabel = this.getNodeValue(this.state.nodeTreeState, childTreePath, 'label');
-            var inheritedProps = {};
-            if (typeof this.props.nodeCallbacks.getInheritedProps === 'function') {
-                inheritedProps = this.props.nodeCallbacks.getInheritedProps(childTreePath, this.props);
-            }
             nodesToRender.push(<LazyNode
                 key={key}
                 nodeLabel={nodeLabel}
@@ -546,8 +544,6 @@ var LazyTree = React.createClass({
                 isNodeOccluded={this.isNodeOccluded}
                 getChildViewportEdgeIndicesA={this.getChildViewportEdgeIndicesA}
                 getChildData={this.getChildData}
-                nodeCallbacks={this.props.nodeCallbacks}
-                inheritedProps={inheritedProps}
             />);
         }
         nodesToRender.push(<Spacer key={'spacer-bottom'} height={this.state.spacerHeights[1]} width={this.getSpacerWidth()}/>);

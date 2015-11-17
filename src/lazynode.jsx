@@ -55,12 +55,9 @@ var LazyNode = React.createClass({
                 indexLastNodeOccludedAbove = indexLastNodeOccludedAbove > 0 ? indexLastNodeOccludedAbove : 0;
                 var indexFirstNodeOccludedBelow = childViewportEdgeIndicesA[1];
                 indexFirstNodeOccludedBelow = indexFirstNodeOccludedBelow > 0 ? indexFirstNodeOccludedBelow : numChildNodes - 1;
-                var childLabel, childTreePathA, nodeKey, index, inheritedProps;
+                var childLabel, childTreePathA, nodeKey, index;
                 for (index = indexLastNodeOccludedAbove; index <= indexFirstNodeOccludedBelow; index ++) {
                     childTreePathA = this.props.treePathA.concat(index);
-                    if (typeof this.props.nodeCallbacks.getInheritedProps === 'function') {
-                        inheritedProps = this.props.nodeCallbacks.getInheritedProps(childTreePathA, this.props);
-                    }
                     childLabel = childLabels[index];
                     nodeKey = utils.arrayToKeyString(childTreePathA);
                     childNodes.push(<LazyNode
@@ -74,7 +71,6 @@ var LazyNode = React.createClass({
                         getChildViewportEdgeIndicesA={this.props.getChildViewportEdgeIndicesA}
                         getChildData={this.props.getChildData}
                         nodeCallbacks={this.props.nodeCallbacks}
-                        inheritedProps={inheritedProps}
                     />);
                 }
             }
