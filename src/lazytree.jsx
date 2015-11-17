@@ -20,6 +20,9 @@ var LazyNode = require('./lazynode.jsx');
 var utils = require('./utils.jsx');
 var $ = require('jquery');
 
+/**
+ * Empty div to fill the space occupied by invisible nodes.
+ */
 var Spacer = React.createClass({
     render: function() {
         var style = {
@@ -32,13 +35,32 @@ var Spacer = React.createClass({
     }
 });
 
+/**
+ * Lazy-loading tree.
+ * Each node is a LazyNode, which loads its children on expand.
+ * Nodes are added and removed from the DOM on scroll.
+ * TODO: implement lazy-loading sibling nodes.
+ */
 var LazyTree = React.createClass({
 
+    /**
+     * Get the value of the given property at the specified tree path.
+     * @param {Object} tree: tree state
+     * @param {Object} treePathA: tree path (array of tree child indices)
+     * @param {String} prop: property to get the value of
+     * @return {Object} value of the property at the specified tree path
+     */
     getNodeValue: function(tree, treePathA, prop) {
         var subTree = this.getSubTree(tree, treePathA);
         return subTree[prop];
     },
 
+    /**
+     * Return the subtree object at the given subtree path.
+     * @param {Object} tree: tree state
+     * @param {Object} treePathA: tree path (array of tree child indices)
+     * @return {Object} the subtree at the specified path
+     */
     getSubTree: function(tree, treePathA) {
         var subTree = tree, pathIndex;
         if (treePathA.length === 0) return tree;
@@ -56,6 +78,17 @@ var LazyTree = React.createClass({
         return subTree;
     },
 
+    /**
+     * Convert a tree path to an object specifying how to traverse the internal tree data structure.
+     *
+     * @param {Object} treePathA: tree path for node to modify
+     * @param {String} command: '$set' if replacing the node's value with a new value,
+     * or '$apply' if value is a function that takes the old value
+     * @param {String} prop: property to change eg 'occluded', 'expanded'
+     * @param {Object} value: a value if command is '$set',
+     * or a function that takes the old value and returns a new one if command is '$apply'
+     * @return {Object} object representing the given tree path
+     */
     getSubTreePathObj: function(treePathA, command, prop, value) {
         if (!treePathA) return {};
         var pathObj = {}, pathIndex;
@@ -78,6 +111,14 @@ var LazyTree = React.createClass({
         return pathObjHead;
     },
 
+    /**
+     * Set a property value of a given tree node.
+     * @param {Object} tree: tree state
+     * @param {Object} treePathA: tree path for node to modify
+     * @param {String} prop: property to set
+     * @param {Object} val: value to set the property to
+     * @return {Object} updated tree
+     */
     setNodeValueImmutable: function(tree, treePathA, prop, val) {
         if (!treePathA) return tree;
         var command, value;
@@ -92,6 +133,14 @@ var LazyTree = React.createClass({
         return ReactAddons.update(tree, subTreePathObj);
     },
 
+    /**
+     * Set the value of the given property for all children of the specified parent.
+     * @param {Object} tree: tree state
+     * @param {Object} treePathParentA: tree path for the parent node
+     * @param {String} prop: property to set for all immediate children of the parent
+     * @param {Object} val: value to set the property to for all children
+     * @return {Object} updated tree
+     */
     setChildNodesValueImmutable: function(tree, treePathParentA, prop, val) {
         var fn = function(childrenObj) {
             for (var pathIndex in childrenObj) {
@@ -109,6 +158,12 @@ var LazyTree = React.createClass({
         return ReactAddons.update(tree, subTreePathObj);
     },
 
+    /**
+     * Recursively convert a nested object (tree) to a sequential set of labels.
+     * Nodes are sequentially placed adjacent to their immediate children.
+     * @param {String} label: subtree label
+     * @param {Object} tree: subtree being processed
+     */
     treeToArray: function(label, tree) {
         if (typeof tree != 'object') return [];
         var sequentialNodesA = [], subTree, subLabel, accLabel;
@@ -125,6 +180,9 @@ var LazyTree = React.createClass({
         return sequentialNodesA;
     },
 
+    /**
+     * @return {Object} initial state
+     */
     getInitialState: function() {
         return {
             nodeTreeState: {'root':{'children':{}}},
@@ -133,6 +191,16 @@ var LazyTree = React.createClass({
         };
     },
 
+    /**
+     * Return true if the node is currently NOT visible.
+     * @param {Object} treePathA: tree path to reach the node eg [0, 3, 1]
+     * @param {Number} nodeIndex: sequential position of the node
+     * @param {Object} tree: tree object
+     * @param {Number} scroll: current scroll position (in px)
+     * @param {Number} panelHeight: height of the panel containing visible nodes (in px)
+     * @param {Number} nodeHeight: height of each node (in px)
+     * @return {Boolean} true if the node is NOT currently visible.
+     */
     isNodeOccluded: function(treePathA, nodeIndex, tree, scroll, panelHeight, nodeHeight) {
         tree = tree || this.state.nodeTreeState;
         nodeIndex = nodeIndex || this.getNodeValue(tree, treePathA, 'position');
@@ -147,6 +215,12 @@ var LazyTree = React.createClass({
         return isOccluded;
     },
 
+    /**
+     * Set a particular node's deployed status. A node is deployed if its parent node is expanded.
+     * @param {Object} tree: tree object
+     * @param {Object} treePathA: tree path to reach the node eg [0, 3, 1]
+     * @param {Object} nodeProps: TODO describe
+     */
     toggleStateDeployed: function(tree, treePathA, nodeProps) {
         // Lazy-load additional child nodes when the parent is expanded:
         var setChildLabels = function(treePathA, childrenLoaded) {
@@ -174,6 +248,10 @@ var LazyTree = React.createClass({
         }
     },
 
+    /**
+     * Set the sequential position index for each deployed node in the tree.
+     * @param {Object} tree: tree object
+     */
     setSequentialTreeState: function(tree) {
         var spacerHeights;
         var nodesA = this.treeToArray([], this.getSubTree(tree, this.treePath([])).children);
@@ -201,11 +279,20 @@ var LazyTree = React.createClass({
         });
     },
 
+    /**
+     * Set a particular node's expanded status. A collapsed node is expanded when clicked.
+     * @param {Object} treePathA: tree path to reach the node eg [0, 3, 1]
+     * @param {Object} nodeProps: TODO describe
+     */
     toggleNodeExpanded: function(treePathA, nodeProps) {
         var tree = this.state.nodeTreeState;
         this.toggleStateDeployed(tree, treePathA, nodeProps);
     },
 
+    /**
+     * Return true if a node is expanded.
+     * @param {Object} treePathA: tree path to reach the node eg [0, 3, 1]
+     */
     isNodeExpanded: function(treePathA) {
         return this.getNodeValue(this.state.nodeTreeState, treePathA, 'expanded');
     },
@@ -239,6 +326,12 @@ var LazyTree = React.createClass({
         this.cachedViewportEdgeIndicesA = viewportEdgeIndicesA;
     },
 
+    /**
+     * Find the first and last visible node in the given array of node paths.
+     * Performs a binary search of the specified nodes to detect the first and last visible node.
+     * @param {Object} childPathsA: array of node paths to search
+     * @return {Object} array of [top, bottom], the first visible node and last visible node.
+     */
     getChildViewportEdgeIndicesA: function(childPathsA) {
         var viewportEdges = this.getViewportEdgeIndicesA();
         var topEdge = viewportEdges[0];
@@ -262,6 +355,15 @@ var LazyTree = React.createClass({
         return [topChild, bottomChild];
     },
 
+    /**
+     * Perform a binary search of the given array.
+     *
+     * @param {Object} a: array to search
+     * @param {Number} s: starting index
+     * @param {Number} e: end index
+     * @param {Function} check: function to call to check if an element is within bounds
+     * @return {Object} the position of the first array element that fails the check condition
+     */
     binarySearch: function(a, s, e, check) {
         if (s === e) return e;
         var mid = Math.ceil((s + e) / 2);
@@ -272,6 +374,12 @@ var LazyTree = React.createClass({
         }
     },
 
+    /**
+     * Return the sequential positions of the last occluded node above, and the first occlude node below.
+     * @param {Object} nodeTreeState: current tree state
+     * @param {Object} nodesA: sequential array of node paths
+     * @return {Object} array of last occluded node above, and first occluded node below
+     */
     viewportEdgeIndicesA: function(nodeTreeState, nodesA) {
         nodeTreeState = nodeTreeState || this.state.nodeTreeState;
         nodesA = nodesA || this.state.sequentialNodesA;
@@ -289,6 +397,13 @@ var LazyTree = React.createClass({
         return [occludedAbove, occludedBelow];
     },
 
+    /**
+     * Compute and return the height of the spacer divs above and below.
+     * @param {Object} tree: current tree state TODO: call this nodeTreeState?
+     * @param {Object} nodesA: sequential array of node paths
+     * @param {Object} viewportEdgeIndicesA: indices of the top and bottom occluded nodes
+     * @return {Object} array containing the top and bottom spacer heights (in px)
+     */
     getSpacerHeights: function(tree, nodesA, viewportEdgeIndicesA) {
         viewportEdgeIndicesA = viewportEdgeIndicesA || this.viewportEdgeIndicesA(tree, nodesA);
         var numDeployedNodes = nodesA.length;
@@ -300,14 +415,22 @@ var LazyTree = React.createClass({
         return [topSpacerHeight, bottomSpacerHeight];
     },
 
+    // TODO: spacer width should be detected from viewport width
     getSpacerWidth: function() {
         return 430;
     },
 
+    /**
+     * Convert a tree path to the internal representation used to address within the tree data structure.
+     */
     treePath: function(pathA) {
         return ['root'].concat(pathA);
     },
 
+    /**
+     * Scroll event handler.
+     * @param {Object} e: scroll event
+     */
     handleScroll: function(e) {
         // During scroll, the tree structure is constant:
         var nodeTreeState = this.state.nodeTreeState;
