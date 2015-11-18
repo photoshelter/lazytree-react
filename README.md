@@ -6,12 +6,12 @@ A nested "file" tree React.js component, with streaming scroll and lazy-loading 
 
 This video shows the demo included in the `demo` directory:
 
-![LazyTree demo]('static/lazytree-demo.gif')
+![LazyTree demo](static/lazytree-demo.gif)
 
 This is the same demo with the [DOMViz]() Chrome extension enabled,
 which highlights DOM mutations:
 
-![LazyTree demo using the DomViz Chrome extension]('static/lazytree-demo-domviz.gif')
+![LazyTree demo using the DomViz Chrome extension](static/lazytree-demo-domviz.gif)
 
 DOM nodes are added and removed on scroll, and on node expand/collapse.
 
