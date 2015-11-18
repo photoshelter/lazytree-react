@@ -20,16 +20,16 @@ DOM nodes are added and removed on scroll, and on node expand/collapse.
 ## Usage
 
 ```javascript
-    var LazyTree = require('lazytree.jsx');
+var LazyTree = require('lazytree.jsx');
 ```
 
 ```javascript
-    var root = $("#root")[0];
-    <LazyTree
-        loadChildren={loadChildren}
-        nodeHeight={30}
-        rootElement={root}
-    />
+var root = $("#root")[0];
+<LazyTree
+    loadChildren={loadChildren}
+    nodeHeight={30}
+    rootElement={root}
+/>
 ```
 
 
@@ -48,7 +48,7 @@ Apache 2.0
 Converting .mov files to .gif files using the ffmpeg CLI:
 
 ```bash
-    ffmpeg -i ~/Desktop/lazytree-demo-domviz.mov -s 359x380 -filter:v "setpts=0.5*PTS" -t 5 -f gif - | gifsicle --optimize=3 > lazytree-demo-domviz.gif
+ffmpeg -i ~/Desktop/lazytree-demo-domviz.mov -s 359x380 -filter:v "setpts=0.5*PTS" -t 5 -f gif - | gifsicle --optimize=3 > lazytree-demo-domviz.gif
 ```
 
 ## LazyTree: a lazy-loading nested 'file' tree in React
