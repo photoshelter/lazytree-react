@@ -76,12 +76,14 @@ var LazyNode = React.createClass({
             }
         }
 
-        // Decide whether to render this node and/or its children:
-        // occluded     expanded        render node     render children
-        // no           no              yes             no
-        // no           yes             yes             yes
-        // yes          no              no              no
-        // yes          yes             no              yes
+        /*
+        Decide whether to render this node and/or its children:
+        occluded     expanded        render node     render children
+        no           no              yes             no
+        no           yes             yes             yes
+        yes          no              no              no
+        yes          yes             no              yes
+        */
         if (isOccluded) {
             if (!isExpanded) {
                 // If this node is OCCLUDED and is NOT EXPANDED, then don't need

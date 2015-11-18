@@ -30,26 +30,40 @@ var arrayToLabelString = function(a) {
 };
 
 /*
- * Returns the label for the node at treePath.
+ * Returns the label for the node at treePathA.
+ * TODO: improve treePathA description
+ * @param {string[]} treePathA: tree path eg ['root', 1, 2]
  */
-var getTerm = function(treePath) {
-    var term = arrayToLabelString(treePath);
+var getTerm = function(treePathA) {
+    var term = arrayToLabelString(treePathA);
     return term;
 };
 
-/*
- * Loads children under the node at treePath. Calls successCb when they're loaded.
- * Or calls failCb if the load fails.
- * treePath starts with ['root'] for the root node. Then ['root', 0] is the first child of the root.
- * ['root', 1] is the second child of the root. etc.
+/**
+ * @callback loadChildrenCallback
+ * TODO: omit the root from the tree path so it matches number[]?
+ * @param {string[]} treePathA: tree path eg ['root', 1, 2]
+ * @param {string[]} nodesA: array of child node labels loaded
  */
-var loadChildren = function(treePath, props, successCb, failCb) {
+
+/**
+ * Loads children under the node at the specified tree path.
+ * `treePathA` structure:
+ * - ['root'] is the root node
+ * - ['root', 0] is the first child of the root
+ * - ['root', n-1] is the nth child of the root
+ * - ['root', 2, 1] is two levels deep, etc
+ * @param {string[]} treePathA: tree path eg ['root', 1, 2]
+ * @param {loadChildrenCallback} successCb: callback called on successful load
+ * @param {loadChildrenCallback} failCb: callback called on failed load
+ */
+var loadChildren = function(treePathA, successCb, failCb) {
     var MAX_CHILD_NODES = 10;
     var MAX_NODES_L1 = 1000;
     var numNodes;
     var maxNodes;
-    if (!treePath) return null;
-    if (treePath.length === 1) {
+    if (!treePathA) return null;
+    if (treePathA.length === 1) {
         maxNodes = MAX_NODES_L1;
     } else {
         maxNodes = MAX_CHILD_NODES;
@@ -57,18 +71,16 @@ var loadChildren = function(treePath, props, successCb, failCb) {
     numNodes = Math.max(Math.floor(Math.random() * maxNodes), 1);
     var nodes = [];
     for (var i = 0; i < numNodes; i ++) {
-        nodes.push(getTerm(treePath.concat(i)));
+        nodes.push(getTerm(treePathA.concat(i)));
     }
-    // TODO: treePath -> treePathA
-    //
     // Simulate a network call by setting an artificial delay
     // proportional to the number of child nodes:
     window.setTimeout(function(successCb, failCb) {
         // A contrived failure condition that will never happen:
         if (nodes.length !== numNodes) {
-            failCb(treePath, nodes);
+            failCb(treePathA, nodes);
         } else {
-            successCb(treePath, nodes);
+            successCb(treePathA, nodes);
         }
     }.bind(this, successCb, failCb), Math.min(numNodes * 100, 1000));
 };

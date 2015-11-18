@@ -18,11 +18,19 @@ A nodes becomes visible when it's scrolled into view, or when its parent node is
 
 ## Installation
 
+```bash
+npm install lazytree
+```
+
 ## Usage
+
+Do a `require` on the JSX file:
 
 ```javascript
 var LazyTree = require('lazytree.jsx');
 ```
+
+Initialize the LazyTree component with the `loadChildren`, `nodeHeight`, and '`rootElement` props:
 
 ```javascript
 var root = $("#root")[0];
@@ -33,6 +41,10 @@ var root = $("#root")[0];
 />
 ```
 
+The props are as follows:
+- `loadChildren`: callback to load child nodes (see `demo/demo.jsx` for description)
+- `nodeHeight`: height of all nodes (in px)
+- `rootElement`: element to mount `LazyTree` component into
 
 ## License
 
