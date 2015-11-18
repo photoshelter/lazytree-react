@@ -29,8 +29,19 @@ html, body {
 }
 
 div.node h3 {
-	height: 25px;
-	margin: 0px;
+    height: 25px;
+    margin: 0px;
+    /* width: 100px; */
+    border: solid 1px gray;
+    font-weight: normal;
+    font-style: normal;
+    font-family: inherit;
+    background: lightsteelblue;
+    text-align: left;
+    padding: 1px 10px;
+    overflow-y: auto;
+    display: inline-block;
+    border-radius: 3px;
 }
 
 div.node {

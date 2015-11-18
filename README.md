@@ -4,6 +4,17 @@ A nested "file" tree React.js component, with streaming scroll and lazy-loading 
 
 ## Demo
 
+This video shows the demo included in the `demo` directory:
+
+![LazyTree demo]('static/lazytree-demo.gif')
+
+This is the same demo with the [DOMViz]() Chrome extension enabled,
+which highlights DOM mutations:
+
+![LazyTree demo using the DomViz Chrome extension]('static/lazytree-demo-domviz.gif')
+
+DOM nodes are added and removed on scroll, and on node expand/collapse.
+
 ## Installation
 
 ## Usage
@@ -28,7 +39,17 @@ Apache 2.0
 
 ## TODO:
 
-- Implement lazy-loading scroll (could use [Waypoint](https://github.com/brigade/react-waypoint))
+- Implement lazy-loading scroll with `loadSiblings` callback
+(could use [Waypoint](https://github.com/brigade/react-waypoint))
+- Fix scrollbar so it shows full size of list
+
+### Generating GIFs
+
+Converting .mov files to .gif files using the ffmpeg CLI:
+
+```bash
+    ffmpeg -i ~/Desktop/lazytree-demo-domviz.mov -s 359x380 -filter:v "setpts=0.5*PTS" -t 5 -f gif - | gifsicle --optimize=3 > lazytree-demo-domviz.gif
+```
 
 ## LazyTree: a lazy-loading nested 'file' tree in React
 
