@@ -1,6 +1,6 @@
 #LazyTree
 
-A nested "file" tree React.js component, with streaming scroll and lazy-loading child nodes.
+A React component for exploring nested lists, with lightweight DOM updates on scroll and lazy-loading nested data.
 
 ## Demo
 
@@ -8,12 +8,13 @@ This video shows the demo included in the `demo` directory:
 
 ![LazyTree demo](static/lazytree-demo.gif)
 
-This is the same demo with the [DOMViz]() Chrome extension enabled,
+This is the same demo with the [DOMViz](https://github.com/paul-jean/dom-viz) Chrome extension enabled,
 which highlights DOM mutations:
 
 ![LazyTree demo using the DomViz Chrome extension](static/lazytree-demo-domviz.gif)
 
-DOM nodes are added and removed on scroll, and on node expand/collapse.
+The mutation highlights show that DOM nodes are added as they enter the view.
+A nodes becomes visible when it's scrolled into view, or when its parent node is expanded.
 
 ## Installation
 
