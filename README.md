@@ -55,8 +55,8 @@ LazyTree allows efficient exploration of large, deeply nested lists.
 
 Internally, LazyTree acts as a parent component for a nested list of LazyNode components:
 
-- Lazy_**Tree**_
-  - Lazy_**Node**_ 1
+- Lazy**Tree**
+  - Lazy**Node** 1
   - LazyNode 2
     - LazyNode 2,1
     - LazyNode 2,2
