@@ -1,4 +1,4 @@
-#LazyTree
+# LazyTree
 
 A React component for displaying large nested lists.
 Implements lightweight DOM updates on scroll, and lazy-loading nested list data.
@@ -20,7 +20,7 @@ A node enters the view when scrolled to, or when its parent node is expanded.
 ## Installation
 
 ```bash
-npm install lazytree
+npm install lazytree-react
 ```
 
 ## Usage

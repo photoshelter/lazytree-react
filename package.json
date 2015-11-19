@@ -1,7 +1,7 @@
 {
   "name": "lazytree-react",
   "version": "1.0.0",
-  "description": "A nested \"file\" tree react.js component, with streaming scroll and lazy-loading child nodes",
+  "description": "A React component for displaying large nested lists.",
   "main": "index.html",
   "scripts": {
     "test": "jest"
@@ -14,8 +14,7 @@
     "react",
     "lazytree",
     "lazynode",
-    "lazy",
-    "load"
+    "lazy-load"
   ],
   "author": "Paul-Jean Letourneau",
   "license": "Apache-2.0",
