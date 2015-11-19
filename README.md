@@ -74,7 +74,7 @@ Here:
 ### LazyTree component
 
 The top-level LazyTree component maintains an internal data structure
-representing the tree state, where a given node is:
+representing the tree state, where a given node is ...
 
 - expanded (children deployed) or collapsed (children not deployed)
 - deployed (parent expanded) or not deployed (parent collapsed)
@@ -83,13 +83,13 @@ representing the tree state, where a given node is:
 ### LazyNode component
 
 Each LazyNode component uses callbacks passed down from LazyTree to query the tree
-state to determine:
+state to determine ...
 
 - should I be rendered? (ie am I currently visible?)
 - should my children be rendered? (ie am I currently expanded?)
 - which of my children should be rendered? (ie which children are visible?)
 
-In order to determine which children should be rendered:
+The process for determining which children should be rendered is:
 
 - binary search for visible children
 - find first visible child
