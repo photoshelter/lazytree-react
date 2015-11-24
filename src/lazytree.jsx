@@ -15,7 +15,7 @@
  */
 
 var React = require('react');
-var ReactAddons = require('react-addons');
+var update = require('react-addons-update');
 var LazyNode = require('./lazynode.jsx');
 var utils = require('./utils.jsx');
 var $ = require('jquery');
@@ -130,7 +130,7 @@ var LazyTree = React.createClass({
             value = val;
         }
         var subTreePathObj = this.getSubTreePathObj(treePathA, command, prop, value);
-        return ReactAddons.update(tree, subTreePathObj);
+        return update(tree, subTreePathObj);
     },
 
     /**
@@ -155,7 +155,7 @@ var LazyTree = React.createClass({
             return childrenObj;
         };
         var subTreePathObj = this.getSubTreePathObj(treePathParentA, '$apply', 'children', fn);
-        return ReactAddons.update(tree, subTreePathObj);
+        return update(tree, subTreePathObj);
     },
 
     /**
@@ -268,7 +268,7 @@ var LazyTree = React.createClass({
                 return tree;
             }.bind(this);
         }.bind(this);
-        tree = ReactAddons.update(tree, {root: {children: {$apply: updateTree(nodesA)}}});
+        tree = update(tree, {root: {children: {$apply: updateTree(nodesA)}}});
         // Cache viewport edges:
         this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(tree, nodesA));
         // Update the top and bottom spacer heights:
@@ -298,8 +298,8 @@ var LazyTree = React.createClass({
         return this.getNodeValue(this.state.nodeTreeState, treePathA, 'expanded');
     },
 
-    // FIXME: how to always return the root element even 
-    // before mounting, when this.getDOMNode() is not available?
+    // TODO: can the container element be obtained via a ref instead of passing
+    // it in as a prop?
     getRootElement: function() {
         return this.props.rootElement;
     },
@@ -460,7 +460,7 @@ var LazyTree = React.createClass({
                 return nodeTreeState;
             }.bind(this);
         }.bind(this);
-        nodeTreeState = ReactAddons.update(nodeTreeState, {root: {children: {$apply: updateTree(nodesA, oldScrollPosition, this.scrollPosition, panelHeight, nodeHeight)}}});
+        nodeTreeState = update(nodeTreeState, {root: {children: {$apply: updateTree(nodesA, oldScrollPosition, this.scrollPosition, panelHeight, nodeHeight)}}});
         this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(nodeTreeState, nodesA));
         // Update the top and bottom spacer heights:
         var spacerHeights = this.getSpacerHeights(nodeTreeState, nodesA, this.getViewportEdgeIndicesA());
@@ -499,7 +499,7 @@ var LazyTree = React.createClass({
                     return nodeTreeState;
                 }.bind(this);
             }.bind(this);
-            tree = ReactAddons.update(tree, {root: {children: {$apply: updateTree(nodesA, 0, panelHeight, nodeHeight)}}});
+            tree = update(tree, {root: {children: {$apply: updateTree(nodesA, 0, panelHeight, nodeHeight)}}});
             this.setViewportEdgeIndicesA(this.viewportEdgeIndicesA(tree, nodesA));
             var spacerHeights = this.getSpacerHeights(tree, nodesA, this.getViewportEdgeIndicesA());
             this.setState({
@@ -553,13 +553,14 @@ var LazyTree = React.createClass({
             />);
         }
         nodesToRender.push(<Spacer key={'spacer-bottom'} height={this.state.spacerHeights[1]} width={this.getSpacerWidth()}/>);
-        var pools = (<div>{nodesToRender}</div>);
-        return pools;
+        return (<div>{nodesToRender}</div>);
     },
 
+    /*
     componentDidUpdate: function() {
         var scroll = this.getScrollPosition();
     },
+    */
 
     componentDidMount: function() {
         this.scrollPosition = this.getScrollPosition();

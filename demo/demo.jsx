@@ -15,6 +15,7 @@
  */
 
 var LazyTree = require('../src/lazytree.jsx');
+var reactDOM = require('react-dom');
 var React = require('react');
 var $ = require('jquery');
 
@@ -89,7 +90,7 @@ $(document).ready(function() {
     var root = $("#root");
     root = root[0] || null;
     if (!root) return null;
-    React.render(
+    reactDOM.render(
         <LazyTree loadChildren={loadChildren} nodeHeight={NODE_HEIGHT} rootElement={root}/>,
         root
     );

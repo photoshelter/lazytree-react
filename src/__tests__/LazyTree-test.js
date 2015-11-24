@@ -9,13 +9,11 @@ var TestUtils = require('react-addons-test-utils');
 
 describe('lazytree', function() {
     it('does stuff', function() {
-        var rootDiv = <div id='root'></div>;
         var LazyTree = require('../lazytree.jsx');
         var tree = TestUtils.renderIntoDocument(
             <LazyTree
                 loadChildren = {() => {}}
                 nodeHeight = {30}
-                rootElement = {rootDiv}
             ></LazyTree>
         );
         expect(LazyTree.getInitialState().spacerHeights).to.equal([0,0]);
