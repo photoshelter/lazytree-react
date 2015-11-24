@@ -15,7 +15,7 @@
  */
 
 var React = require('react');
-var ReactAddons = require('react/addons').addons;
+var ReactAddons = require('react-addons');
 var LazyNode = require('./lazynode.jsx');
 var utils = require('./utils.jsx');
 var $ = require('jquery');
