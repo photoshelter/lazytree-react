@@ -91,7 +91,7 @@ $(document).ready(function() {
     root = root[0] || null;
     if (!root) return null;
     reactDOM.render(
-        <LazyTree loadChildren={loadChildren} nodeHeight={NODE_HEIGHT} rootElement={root}/>,
+        <LazyTree loadChildren={loadChildren} nodeHeight={NODE_HEIGHT}/>,
         root
     );
 });

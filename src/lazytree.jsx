@@ -15,6 +15,7 @@
  */
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var update = require('react-addons-update');
 var LazyNode = require('./lazynode.jsx');
 var utils = require('./utils.jsx');
@@ -236,7 +237,7 @@ var LazyTree = React.createClass({
             tree = this.setChildNodesValueImmutable(tree, treePathA, 'deployed', true);
             this.setSequentialTreeState(tree);
         }.bind(this);
-        if (!utils.areChildrenLoaded(treePathA, nodeProps)) {
+        if (!utils.areChildrenLoaded(treePathA)) {
             var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
             this.props.loadChildren(treePathA, setChildLabels, failCb);
             // Expand the node now to show the "loading" spinner:
@@ -301,18 +302,23 @@ var LazyTree = React.createClass({
     // TODO: can the container element be obtained via a ref instead of passing
     // it in as a prop?
     getRootElement: function() {
-        return this.props.rootElement;
+        return this.state.rootElement;
     },
 
+    // TODO: add scroll position to state? would have to debounce
     getScrollPosition: function() {
         var root = this.getRootElement();
-        var scroll = root.scrollTop;
-        return scroll;
+        if (root) {
+            var scroll = root.scrollTop;
+            return scroll;
+        }
     },
 
+    PANEL_HEIGHT_GUESS: 800,
     getPanelHeight: function() {
         var root = this.getRootElement();
-        return root.clientHeight;
+        if (root)
+            return root.clientHeight;
     },
 
     getNodeHeight: function() {
@@ -508,7 +514,7 @@ var LazyTree = React.createClass({
                 spacerHeights: spacerHeights
             });
         }.bind(this);
-        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]))) {
             // TODO: retry load on fail?
             var failCb = function(path, nodes) { console.warn('LazyTree: failed to load path ' + path);};
             this.props.loadChildren(this.treePath([]), initTreeState, failCb);
@@ -524,7 +530,7 @@ var LazyTree = React.createClass({
     },
 
     render: function() {
-        if (!utils.areChildrenLoaded(this.treePath([]), this.props)) {
+        if (!utils.areChildrenLoaded(this.treePath([]))) {
             return (<div className="loading"><p>Loading ...</p></div>);
         }
         var topNodes = Object.keys(this.getChildData(this.treePath([])));
@@ -553,20 +559,39 @@ var LazyTree = React.createClass({
             />);
         }
         nodesToRender.push(<Spacer key={'spacer-bottom'} height={this.state.spacerHeights[1]} width={this.getSpacerWidth()}/>);
-        return (<div>{nodesToRender}</div>);
+        // TODO: set visible=false before this ref is available
+        return (<div ref="pool">{nodesToRender}</div>);
     },
 
-    /*
     componentDidUpdate: function() {
-        var scroll = this.getScrollPosition();
+        if (!this.refs.pool) {
+            var panelHeight = this.state.panelHeight;
+            if (!panelHeight) panelHeight = this.PANEL_HEIGHT_GUESS;
+            // use a slightly different panel height guess so state is different
+            // from previous and will trigger a re-render
+            panelHeight++;
+            var panelUpdateCount = this.state.panelUpdateCount;
+            if (!panelUpdateCount) panelUpdateCount = 0;
+            panelUpdateCount++;
+            // do throttled state updates until refs become available
+            setTimeout(function() {
+                this.setState({panelHeight: panelHeight, panelUpdateCount: panelUpdateCount});
+            }.bind(this), 100);
+        } else {
+            if (this.state.rootElement) {
+                this.scrollPosition = this.getScrollPosition();
+                this.getRootElement().onmousewheel = function(e) {
+                    this.handleScroll(e);
+                }.bind(this);
+            } else {
+                this.setState({rootElement: this.refs.pool.parentNode});
+            }
+        }
     },
-    */
 
     componentDidMount: function() {
-        this.scrollPosition = this.getScrollPosition();
-        this.getRootElement().onmousewheel = function(e) {
-            this.handleScroll(e);
-        }.bind(this);
+        // Use a panel height estimate until refs are available
+        this.setState({panelHeight: this.PANEL_HEIGHT_GUESS, panelUpdateCount: 0});
     }
 
 });

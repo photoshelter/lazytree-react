@@ -42,7 +42,7 @@ gulp.task('build-demo', function() {
 gulp.task('build', ['build-lazytree', 'build-demo']);
 
 gulp.task('watch', function() {
-    gulp.watch(paths.lazytree, ['lint', 'build-lazytree']);
+    gulp.watch(paths.lazytree, ['lint', 'build-lazytree', 'build-demo']);
     gulp.watch(paths.demo, ['lint', 'build-demo']);
 });
 

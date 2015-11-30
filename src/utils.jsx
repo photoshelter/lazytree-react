@@ -32,7 +32,7 @@ var utils = {
     // node.js 'require' returns a singleton, so this prop will
     // be shared by all instances that require this module:
     treePathsLoaded: {},
-    areChildrenLoaded: function(treePath, props) {
+    areChildrenLoaded: function(treePath) {
         var areLoaded = typeof this.treePathsLoaded[treePath] === 'object' ? true : false;
         return areLoaded;
     },
@@ -40,7 +40,7 @@ var utils = {
     /*
      * Get the children loaded at the specified tree path.
      */
-    getChildLabels: function(treePath, props) {
+    getChildLabels: function(treePath) {
         return this.treePathsLoaded[treePath];
     }
 };
