@@ -1,11 +1,11 @@
 jest.dontMock('../lazytree.jsx');
 jest.dontMock('../lazynode.jsx');
 
-var LazyTree = require('../lazytree.jsx');
+//var LazyTree = require('../lazytree.jsx');
 
 var React = require('react');
 var TestUtils = require('react-addons-test-utils');
-//var expect = require('chai').expect;
+var expect = require('chai').expect;
 
 describe('lazytree', function() {
     it('does stuff', function() {
@@ -16,6 +16,7 @@ describe('lazytree', function() {
                 nodeHeight = {30}
             ></LazyTree>
         );
-        expect(LazyTree.getInitialState().spacerHeights).to.equal([0,0]);
+        expect(tree.getInitialState().spacerHeights[0]).to.equal(0);
+        expect(tree.getInitialState().spacerHeights[1]).to.equal(0);
     });
 });
